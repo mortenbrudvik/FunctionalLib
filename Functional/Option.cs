@@ -3,18 +3,18 @@ using Ardalis.GuardClauses;
 
 namespace Functional
 {
-    using static F;
+    using static Fun;
     
-    public static partial class F
+    public static class Fun
     {
-        public static Option<T> Some<T>(T value) => new Option.Some<T>();
+        public static Option<T> Some<T>(T value) => new Option.Some<T>(value);
         public static Option.None None => Option.None.Default;
     }
     
     public struct Option<T> 
     {
-        readonly T _value;
-        readonly bool _isSome;
+        private readonly T _value;
+        private readonly bool _isSome;
         
         private Option(T value)
         {
@@ -26,8 +26,8 @@ namespace Functional
         public static implicit operator Option<T>(Option.Some<T> some) => new(some.Value);
         public static implicit operator Option<T>(T value) => value == null ? None : Some(value);
         
-        public R Match<R>(Func<R> none, Func<T, R> some)
-            => _isSome ? some(_value) : none();
+        public R Match<R>(Func<R> None, Func<T, R> Some) 
+            => _isSome ? Some(_value) : None();
     }
 
     namespace Option
@@ -37,12 +37,10 @@ namespace Functional
             internal static readonly None Default = new();
         }
 
-        public struct Some<T>
+        public readonly struct Some<T>
         {
             internal T Value { get; }
-
-            internal Some(T value) 
-                => Value = Guard.Against.Null(value, nameof(value));
+            internal Some(T value) => Value = Guard.Against.Null(value, nameof(value));
         }
     }
 }

@@ -1,32 +1,33 @@
+using System;
 using FluentAssertions;
 using Functional;
 using Xunit;
 
-using static Functional.F;
+using static Functional.Fun;
 
 namespace UnitTests
 {
     public class OptionsTests
     {
         [Fact]
-        public void Match_when_some_value()
+        public void Match_when_Some_value()
         {
             var result = Parse("1");
 
-            result.Match(() => false, (_) => true)
+            result.Match(None: () => false, Some: (n) => n == 1)
                 .Should().BeTrue();
         }
         
         [Fact]
-        public void Match_when_none_value()
+        public void Match_when_None_value()
         {
             var result = Parse("hello");
 
-            result.Match(() => false, (_) => true)
+            result.Match(None: () => false, Some: (_) => true)
                 .Should().BeFalse();
         }
-        
-        Option<int> Parse(string strNumber) 
+
+        private static Option<int> Parse(string strNumber) 
             => int.TryParse(strNumber, out var intNumber) 
                 ? Some(intNumber) : None;
     }
