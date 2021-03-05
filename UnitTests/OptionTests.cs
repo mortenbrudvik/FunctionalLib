@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FluentAssertions;
 using Functional;
+using JetBrains.Annotations;
 using Xunit;
 
 using static Functional.Fun;
@@ -12,23 +13,13 @@ namespace UnitTests
     public class OptionsTests
     {
         [Fact]
-        public void Lookup_when_value_exist()
+        public void Option_testing_conversion()
         {
-            var dict = new Dictionary<string, string> {{"1", "Some"}};
+            Option<int> noneOpt = None;
 
-            dict.Lookup("1")
-                .Match(()=>false, v=>v == "Some")
-                .Should().BeTrue();
-        }
-        
-        [Fact]
-        public void Lookup_when_value_does_not_exist()
-        {
-            var dict = new Dictionary<string, string> {{"1", "Some"}};
-            
-            dict.Lookup("2")
-                .Match(()=>false, v => v == "Some")
-                .Should().BeFalse();
+            Assert.True(noneOpt == None);
+            Assert.True(Some(1) == 1);
+            Assert.True(Some(1) != 2);
         }
         
         [Fact]
@@ -45,6 +36,19 @@ namespace UnitTests
             Int.Parse("Fun")
                 .Match(() => true, n => false)
                 .Should().BeTrue();
+        }
+        
+        [Fact]
+        public void Map_option_of_none_and_some()
+        {
+            var age = Some(22);
+
+            age.Map(x => x + 1)
+                .Should().Be(Some(23));
+
+            age = None;
+            age.Map(x => x + 1)
+                .IsNone.Should().BeTrue();
         }
     }
 }

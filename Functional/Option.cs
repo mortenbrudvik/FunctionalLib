@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Ardalis.GuardClauses;
+using Unit = System.ValueTuple;
 
 namespace Functional
 {
@@ -11,23 +13,59 @@ namespace Functional
         public static Option.None None => Option.None.Default;
     }
     
-    public struct Option<T> 
+    public readonly struct Option<T>  : IEquatable<Option.None>, IEquatable<Option<T>> 
     {
-        private readonly T _value;
-        private readonly bool _isSome;
-        
+
+        internal T Value { get; }
+        public  bool IsSome { get; }
+        public  bool IsNone => !IsSome;
+
         private Option(T value)
         {
-            _value = Guard.Against.Null(value, nameof(value));
-            _isSome = true;
+            Value = Guard.Against.Null(value, nameof(value));
+            IsSome = true;
         }
         
         public static implicit operator Option<T>(Option.None _) => new();
         public static implicit operator Option<T>(Option.Some<T> some) => new(some.Value);
         public static implicit operator Option<T>(T value) => value == null ? None : Some(value);
         
-        public R Match<R>(Func<R> None, Func<T, R> Some) 
-            => _isSome ? Some(_value) : None();
+        public TR Match<TR>(Func<TR> onNone, Func<T, TR> onSome) 
+            => IsSome ? onSome(Value) : onNone();
+        
+        public IEnumerable<T> AsEnumerable()
+        {
+            if (IsSome) yield return Value;
+        }
+        
+        public bool Equals(Option<T> other) 
+            => IsSome == other.IsSome 
+               && (IsNone || Value.Equals(other.Value));
+
+        public bool Equals(Option.None _) => IsNone;
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            if (obj.GetType() != typeof(Option<T>))
+            {
+                if (obj is T)
+                    obj = new Option<T>((T)obj);
+
+                if (!(obj is Option<T>))
+                    return false;
+            }
+            return Equals((Option<T>)obj);
+        }
+
+        public override int GetHashCode() => IsNone ? 0 : Value.GetHashCode();
+
+        public static bool operator ==(Option<T> first, Option<T> second) => first.Equals(second);
+        public static bool operator !=(Option<T> first, Option<T> second) => !(first == second);
+
+        public override string ToString() => IsSome ? $"Some({Value})" : "None";
     }
 
     namespace Option
@@ -42,5 +80,24 @@ namespace Functional
             internal T Value { get; }
             internal Some(T value) => Value = Guard.Against.Null(value, nameof(value));
         }
+    }
+
+    public static class OptionExt
+    {
+        public static Option<TR> Map<T, TR>
+            (this Option.None _, Func<T, TR> f)
+            => None;
+        
+        public static Option<TR> Map<T, TR>
+            (this Option.Some<T> some, Func<T, TR> f) 
+            => Some(f(some.Value));
+        
+        public static Option<TR> Map<T, TR>(this Option<T> optT, Func<T, TR> f)
+            => optT.Match(
+                () => None,
+                (t) => Some(f(t)));
+        
+        public static Unit Match<T>(this Option<T> optT, Action onNone, Action<T> onSome)
+            => optT.Match(onNone.ToFunc(), onSome.ToFunc());
     }
 }
