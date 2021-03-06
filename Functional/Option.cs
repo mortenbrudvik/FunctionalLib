@@ -97,6 +97,23 @@ namespace Functional
                 () => None,
                 (t) => Some(f(t)));
         
+        public static Option<R> Bind<T, R>(this Option<T> optT, Func<T, Option<R>> f)
+            => optT.Match(
+                () => None,
+                t => f(t));
+        
+        public static IEnumerable<R> Bind<T, R>(this Option<T> opt, Func<T, IEnumerable<R>> func)
+            => opt.AsEnumerable().Bind(func);
+        
+        public static Option<T> Where<T>
+            (this Option<T> optT, Func<T, bool> pred)
+            => optT.Match(
+                () => None,
+                (t) => pred(t) ? optT : None);
+        
+        public static Option<Unit> ForEach<T>(this Option<T> opt, Action<T> action)
+            => Map(opt, action.ToFunc());
+        
         public static Unit Match<T>(this Option<T> optT, Action onNone, Action<T> onSome)
             => optT.Match(onNone.ToFunc(), onSome.ToFunc());
     }

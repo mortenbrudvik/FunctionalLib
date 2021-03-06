@@ -50,5 +50,48 @@ namespace UnitTests
             age.Map(x => x + 1)
                 .IsNone.Should().BeTrue();
         }
+
+        [Fact]
+        public void Foreach_should_run_action_on_option()
+        {
+            var nameOpt = Some("Bob");
+            Option<string> nameResult = "";
+            nameOpt.ForEach(name => nameResult = name + " and Lisa");
+
+            Assert.True(nameResult == "Bob and Lisa");
+        }
+        
+        [Fact]
+        public void Bind_unwrap_option_to_primitive()
+        {
+            var name = Some("Bob");
+
+            var strName = name.Bind(Some);
+            var strName2 = name.Map(Some);
+
+            Assert.IsType<Option<string>>(strName);
+            Assert.IsType<Option<Option<string>>>(strName2);
+        }
+        
+        [Fact]
+        public void Bind_double_option_and_return_single_option()
+        {
+            var car = Some("Volvo");
+            
+            Some(car).Bind(x => x)
+                .Should().BeEquivalentTo(car);
+        }
+
+        [Fact]
+        public void Where_with_some_and_none()
+        {
+            var car = Some("car");
+
+            car.Where(x => x == "car")
+                .IsSome.Should().BeTrue();
+
+            car.Where(x => x == "volvo")
+                .IsNone.Should().BeTrue();
+        }
     }
 }
