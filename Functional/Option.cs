@@ -7,7 +7,7 @@ namespace Functional
 {
     using static Fun;
     
-    public static class Fun
+    public static partial class Fun
     {
         public static Option<T> Some<T>(T value) => new Option.Some<T>(value);
         public static Option.None None => Option.None.Default;
