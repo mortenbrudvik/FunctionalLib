@@ -1,5 +1,8 @@
 ﻿using System;
 
+using Fun;
+using static Fun.Predlude;
+
 namespace FunctionalConsole
 {
     public class Program
@@ -13,9 +16,17 @@ namespace FunctionalConsole
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            Greetings.Run();
+            var car = Some(new Car());
+            var car2 = None;
+
+            
 
             Console.In.ReadLine();
+        }
+        
+        public class Car
+        {
+            public string Brand { get; set; }
         }
     }
 }
