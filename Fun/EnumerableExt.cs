@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Unit = System.ValueTuple;
 
-using static Functional.Fun;
-
-namespace Functional
+namespace Fun
 {
     public static class EnumerableExt
     {

@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Ardalis.GuardClauses;
 using Unit = System.ValueTuple;
-using static Fun.Predlude;
+using static Fun.Prelude;
 
 namespace Fun
 {
@@ -28,6 +29,11 @@ namespace Fun
         public static implicit operator Option<T>(Option.None _) => new();
         public static implicit operator Option<T>(Option.Some<T> some) => new(some.Value);
         public static implicit operator Option<T>(T value) => value == null ? None : new Option<T>(value);
+        
+        public IEnumerable<T> AsEnumerable()
+        {
+            if (HasValue) yield return Value;
+        }
 
         public bool Equals(Option<T> other) =>
             other switch
@@ -44,7 +50,7 @@ namespace Fun
             HasValue ? Value.GetHashCode() : 0;
     }
     
-    public static partial class Predlude
+    public static partial class Prelude
     {
         public static Unit Unit() => default;
         public static Option<T> Some<T>(T value) => new Option.Some<T>(value);

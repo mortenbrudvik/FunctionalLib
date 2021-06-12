@@ -1,23 +1,21 @@
 ﻿using System;
-
+using System.Collections.Generic;
 using Fun;
-using static Fun.Predlude;
+using static Fun.Prelude;
 
 namespace FunctionalConsole
 {
     public class Program
     {
-        /// <summary>
-        /// This code is based on the book Functional C# book by Manning.
-        /// https://www.manning.com/books/functional-programming-in-c-sharp
-        /// Code examples from the book can be found on:
-        /// https://github.com/la-yumba/functional-csharp-code
-        /// </summary>
-        /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            var car = Some(new Car());
+            var car = Some(new Car("Jaguar"));
             var car2 = None;
+
+            var cars = new List<Option<Car>> {Some(new Car("Volvo")), None,Some(new Car("Fiat"))};
+            
+            // Test bind a function that return an option
+            
 
             
 
@@ -26,6 +24,10 @@ namespace FunctionalConsole
         
         public class Car
         {
+            public Car(string brand)
+            {
+                Brand = brand;
+            }
             public string Brand { get; set; }
         }
     }
